@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>I2 Exam Analysis</title>
+<style>
+*{box-sizing:border-box;font-family:'Segoe UI',Roboto,system-ui,sans-serif}
+body{background:#eef3fa;margin:0;padding:1.2rem .8rem}
+.container{max-width:1500px;margin:0 auto;background:#fff;border-radius:24px;box-shadow:0 20px 40px -12px rgba(0,20,50,.2);padding:1.6rem}
+h1{font-size:1.6rem;font-weight:600;margin:0 0 .3rem;color:#0b2a4a}
+h1 small{font-size:.85rem;font-weight:400;background:#e7eef9;color:#1f4e7a;padding:.25rem .8rem;border-radius:30px;margin-left:8px}
+.subhead{color:#3e5e7e;margin:.3rem 0 1.4rem;font-size:.9rem;border-left:4px solid #2f7ec4;padding-left:1rem}
+.q-controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:#f5f9ff;border:1.5px solid #c9ddf2;border-radius:16px;padding:.9rem 1.2rem;margin-bottom:1.2rem}
+.q-controls strong{color:#0b2a4a;font-size:.9rem}
+.q-controls .spacer{flex:1}
+.entry-form{background:linear-gradient(135deg,#eaf3ff 0%,#f5faff 100%);border:2px solid #c9ddf2;border-radius:20px;padding:1.4rem;margin-bottom:1.8rem}
+.entry-form h2{margin:0 0 1rem;font-size:1.05rem;color:#0b2a4a;display:flex;align-items:center;gap:8px}
+.step-num{background:#1f4e7a;color:#fff;width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.85rem}
+.name-row{display:flex;gap:12px;align-items:flex-end;margin-bottom:1rem;flex-wrap:wrap}
+.input-group{flex:1;min-width:220px;display:flex;flex-direction:column;gap:5px}
+.input-group label{font-weight:600;font-size:.78rem;text-transform:uppercase;color:#1d4b7a;letter-spacing:.03em}
+.input-group input{padding:.75rem 1rem;border-radius:40px;border:1.5px solid #b9d0e6;font-size:1rem;background:#fff;outline:none;font-weight:500}
+.input-group input:focus{border-color:#2f7ec4;box-shadow:0 0 0 4px rgba(47,126,196,.12)}
+.questions-label{font-weight:600;font-size:.78rem;text-transform:uppercase;color:#1d4b7a;letter-spacing:.03em;margin-bottom:.6rem}
+.entry-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin-bottom:1rem;max-height:340px;overflow-y:auto;padding:4px}
+.q-box{background:#fff;border:1.5px solid #d7e5f2;border-radius:12px;padding:6px 8px;display:flex;align-items:center;justify-content:space-between;gap:6px;transition:.15s}
+.q-box.answered-yes{border-color:#86c79a;background:#f0faf3}
+.q-box.answered-no{border-color:#e9a6a6;background:#fdf1f1}
+.q-num{font-weight:700;color:#1d4b7a;font-size:.82rem;min-width:36px}
+.q-btns{display:flex;gap:3px}
+.q-box button{border:none;border-radius:30px;padding:4px 10px;font-size:.75rem;font-weight:700;cursor:pointer;transition:.15s;background:#eef4fd;color:#6a839c}
+.q-box button:hover{background:#dde9f7}
+.q-box button.sel-yes{background:#28a745;color:#fff}
+.q-box button.sel-no{background:#dc3545;color:#fff}
+.form-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn{border:1.5px solid #b8cee6;background:#fff;padding:.55rem 1.1rem;border-radius:40px;font-weight:600;color:#1a3e60;cursor:pointer;font-size:.85rem;display:inline-flex;align-items:center;gap:6px;transition:.15s}
+.btn:hover{background:#e3edf9}
+.btn-primary{background:#1f4e7a;color:#fff;border-color:#1f4e7a;padding:.65rem 1.8rem;font-size:.92rem;box-shadow:0 8px 16px -6px #1f4e7a80}
+.btn-primary:hover{background:#0e3a5e}
+.btn-success{background:#0f6b3a;color:#fff;border-color:#0a542d;box-shadow:0 6px 14px -6px #0f6b3a90}
+.btn-success:hover{background:#0a542d}
+.btn-save{background:#b8860b;color:#fff;border-color:#8b6508;box-shadow:0 6px 14px -6px #b8860b90}
+.btn-save:hover{background:#8b6508}
+.btn-danger{background:#a12222;color:#fff;border-color:#7a1a1a}
+.btn-danger:hover{background:#7a1a1a}
+.btn-sm{padding:.4rem .85rem;font-size:.78rem}
+.entry-progress{margin-left:auto;font-size:.82rem;font-weight:600;color:#1d4b7a;background:#e2eefb;padding:.35rem .9rem;border-radius:30px}
+.table-header-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:.8rem;flex-wrap:wrap;gap:10px}
+.table-header-bar h2{margin:0;font-size:1.05rem;color:#0b2a4a}
+.counter-badge{background:#d9e7f7;border-radius:30px;padding:.3rem 1rem;font-size:.78rem;font-weight:600;color:#1a4a76}
+.table-wrapper{overflow-x:auto;border-radius:16px;border:1px solid #d9e4f0;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,.03)}
+table{border-collapse:collapse;white-space:nowrap;font-size:.8rem}
+th{background:#e9f0f9;color:#113a5e;font-weight:700;font-size:.7rem;text-transform:uppercase;padding:.8rem .5rem;border-bottom:2px solid #bed4ea;text-align:center;position:sticky;top:0;z-index:3}
+th.serial-header{background:#dbe7f5}
+th.name-header{background:#dbe7f5;text-align:left;padding-left:1rem}
+th.total-yes-header{background:#d5ebd9;color:#0a542d}
+th.total-no-header{background:#f8d7d7;color:#a12222}
+th.remark-header{background:#fff3cd;color:#856404}
+td{padding:.55rem .4rem;border-bottom:1px solid #e3ecf5;text-align:center;font-size:.8rem}
+td.serial-cell{background:#f4f8fd;font-weight:700;color:#1d4b7a}
+td.name-cell{text-align:left;padding-left:1rem;font-weight:600;color:#0b2a4a;background:#fafdff;border-right:1px solid #d9e4f0}
+tr:hover td{background:#f2f8ff}
+tr:hover td.name-cell{background:#e8f1fc}
+.yes-mark{color:#0f973d;font-weight:700}
+.no-mark{color:#c62828;font-weight:700}
+.blank-mark{color:#b0bec9}
+.total-yes-cell{background:#eaf7ed;color:#0a542d;font-weight:700;font-size:.88rem;border-left:2px solid #b8dcc3}
+.total-no-cell{background:#fdeeee;color:#a12222;font-weight:700;font-size:.88rem;border-left:2px solid #ecc2c2}
+.remark-cell{font-weight:700;font-size:.8rem}
+.remark-pass{background:#d4edda;color:#155724}
+.remark-fail{background:#f8d7da;color:#721c24}
+.remark-pending{background:#fff3cd;color:#856404}
+.empty-row td{text-align:center;padding:2.5rem;color:#7e95ab;font-style:italic}
+.delete-btn{background:transparent;border:none;cursor:pointer;font-size:.9rem;color:#9b2c2c;border-radius:30px;width:24px;height:24px;margin-left:6px}
+.delete-btn:hover{background:#ffe1e1}
+.toast{position:fixed;bottom:24px;right:24px;background:#1f4e7a;color:#fff;padding:12px 22px;border-radius:40px;font-weight:600;font-size:.88rem;box-shadow:0 10px 30px -8px rgba(0,0,0,.4);opacity:0;transform:translateY(20px);transition:.3s;z-index:999}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.success{background:#0f6b3a}
+.toast.info{background:#1f4e7a}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>📋 I2 Exam Analysis <small id="qCountLabel">40 Questions</small></h1>
+  <div class="subhead">
+    <strong>Step 1:</strong> Type student name &nbsp;→&nbsp;
+    <strong>Step 2:</strong> Mark Yes/No for each question &nbsp;→&nbsp;
+    <strong>Step 3:</strong> Click "Add Student"
+  </div>
+
+  <div class="q-controls">
+    <strong>🔢 Total Questions:</strong>
+    <span id="currentQCount" style="font-weight:700;color:#1f4e7a;font-size:1rem;">40</span>
+    <button class="btn btn-sm" id="addQuestionBtn">➕ Add Question</button>
+    <button class="btn btn-sm btn-danger" id="removeQuestionBtn">➖ Remove Last Question</button>
+    <div class="spacer"></div>
+    <small style="color:#5a738d;font-size:.78rem;">Add if more than 40 · Remove if fewer</small>
+  </div>
+
+  <div class="entry-form">
+    <h2><span class="step-num">1</span> Enter Student Details</h2>
+    <div class="name-row">
+      <div class="input-group">
+        <label>👤 Student Name</label>
+        <input type="text" id="studentNameInput" placeholder="Type student name here..." autocomplete="off">
+      </div>
+      <button class="btn btn-primary" id="addStudentBtn">➕ Add Student to Table</button>
+    </div>
+    <div class="questions-label">
+      📝 Mark each question:
+      <span style="color:#0f973d;">Yes = Attempted &amp; got marks</span> ·
+      <span style="color:#c62828;">No = Not attempted / No marks</span>
+    </div>
+    <div class="entry-grid" id="entryGrid"></div>
+    <div class="form-actions">
+      <button class="btn btn-sm" id="markAllYes">✅ All Yes</button>
+      <button class="btn btn-sm" id="markAllNo">❌ All No</button>
+      <button class="btn btn-sm" id="clearAll">🔄 Clear All</button>
+      <span class="entry-progress" id="entryProgress">0 / 40 answered</span>
+    </div>
+  </div>
+
+  <div class="table-header-bar">
+    <h2>📊 Student Results</h2>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+      <span class="counter-badge" id="studentCounter">0 students</span>
+      <button class="btn btn-save" id="saveBtn">💾 Save</button>
+      <button class="btn btn-success" id="exportExcelBtn">⬇ Export to Excel</button>
+    </div>
+  </div>
+
+  <div class="table-wrapper">
+    <table id="examTable">
+      <thead>
+        <tr id="tableHeaderRow">
+          <th class="serial-header">S.No</th>
+          <th class="name-header">Student Name</th>
+          <th class="total-yes-header">Total Yes</th>
+          <th class="total-no-header">Total No</th>
+          <th class="remark-header">Remark</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+(function(){
+  var PASS_MARK = 20;
+  var STORAGE_KEY = 'i2_exam_dynamic_v1';
+  var DEFAULT_QUESTIONS = 40;
+  var MIN_QUESTIONS = 1;
+  var MAX_QUESTIONS = 100;
+
+  var totalQuestions = DEFAULT_QUESTIONS;
+  var students = [];
+  var currentAnswers = [];
+
+  function resetCurrentAnswers(){
+    currentAnswers = [];
+    for(var i=0;i<totalQuestions;i++) currentAnswers.push('');
+  }
+  resetCurrentAnswers();
+
+  function $(id){ return document.getElementById(id); }
+  function generateId(){ return Date.now() + '-' + Math.random().toString(36).substring(2,9); }
+
+  var toastTimer = null;
+  function showToast(msg, type){
+    var t = $('toast');
+    t.textContent = msg;
+    t.className = 'toast show ' + (type||'info');
+    if(toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 2600);
+  }
+
+  function escapeHtml(s){
+    return String(s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+  }
+
+  function buildTableHeader(){
+    var headerRow = $('tableHeaderRow');
+    while(headerRow.children.length > 2){
+      headerRow.removeChild(headerRow.lastChild);
+    }
+    for(var q=1; q<=totalQuestions; q++){
+      var th = document.createElement('th');
+      th.textContent = 'Q' + q;
+      headerRow.appendChild(th);
+    }
+    var thY = document.createElement('th');
+    thY.textContent = 'Total Yes';
+    thY.className = 'total-yes-header';
+    headerRow.appendChild(thY);
+
+    var thN = document.createElement('th');
+    thN.textContent = 'Total No';
+    thN.className = 'total-no-header';
+    headerRow.appendChild(thN);
+
+    var thR = document.createElement('th');
+    thR.textContent = 'Remark';
+    thR.className = 'remark-header';
+    headerRow.appendChild(thR);
+
+    $('qCountLabel').textContent = totalQuestions + ' Questions';
+    $('currentQCount').textContent = totalQuestions;
+  }
+
+  function buildEntryGrid(){
+    var grid = $('entryGrid');
+    grid.innerHTML = '';
+    for(var q=0; q<totalQuestions; q++){
+      (function(idx){
+        var box = document.createElement('div');
+        box.className = 'q-box';
+
+        var qNum = document.createElement('span');
+        qNum.className = 'q-num';
+        qNum.textContent = 'Q' + (idx+1);
+        box.appendChild(qNum);
+
+        var btns = document.createElement('div');
+        btns.className = 'q-btns';
+
+        var yesBtn = document.createElement('button');
+        yesBtn.textContent = 'Yes';
+        yesBtn.dataset.val = 'yes';
+        yesBtn.addEventListener('click', function(){
+          currentAnswers[idx] = 'yes';
+          refreshEntryGrid();
+        });
+
+        var noBtn = document.createElement('button');
+        noBtn.textContent = 'No';
+        noBtn.dataset.val = 'no';
+        noBtn.addEventListener('click', function(){
+          currentAnswers[idx] = 'no';
+          refreshEntryGrid();
+        });
+
+        btns.appendChild(yesBtn);
+        btns.appendChild(noBtn);
+        box.appendChild(btns);
+        grid.appendChild(box);
+      })(q);
+    }
+    refreshEntryGrid();
+  }
+
+  function refreshEntryGrid(){
+    var boxes = document.querySelectorAll('#entryGrid .q-box');
+    for(var i=0;i<boxes.length;i++){
+      var box = boxes[i];
+      var yesBtn = box.querySelector('button[data-val="yes"]');
+      var noBtn  = box.querySelector('button[data-val="no"]');
+      yesBtn.classList.remove('sel-yes');
+      noBtn.classList.remove('sel-no');
+      box.classList.remove('answered-yes','answered-no');
+      if(currentAnswers[i] === 'yes'){
+        yesBtn.classList.add('sel-yes');
+        box.classList.add('answered-yes');
+      } else if(currentAnswers[i] === 'no'){
+        noBtn.classList.add('sel-no');
+        box.classList.add('answered-no');
+      }
+    }
+    var answered = 0;
+    for(var j=0;j<currentAnswers.length;j++){
+      if(currentAnswers[j] !== '') answered++;
+    }
+    $('entryProgress').textContent = answered + ' / ' + totalQuestions + ' answered';
+  }
+
+  function computeTotals(student){
+    var yes = 0, no = 0;
+    var ans = student.answers || [];
+    for(var i=0;i<totalQuestions;i++){
+      if(ans[i] === 'yes') yes++;
+      else if(ans[i] === 'no') no++;
+    }
+    var remark = 'Pending';
+    var answered = yes + no;
+    if(answered === totalQuestions) remark = yes >= PASS_MARK ? 'Pass' : 'Fail';
+    else if(answered > 0) remark = 'Incomplete';
+    return { yes: yes, no: no, remark: remark };
+  }
+
+  function renderTable(){
+    var tbody = $('tableBody');
+    tbody.innerHTML = '';
+
+    if(students.length === 0){
+      var tr0 = document.createElement('tr');
+      tr0.className = 'empty-row';
+      var td0 = document.createElement('td');
+      td0.colSpan = totalQuestions + 5;
+      td0.textContent = 'No students added yet. Use the form above to add the first student.';
+      tr0.appendChild(td0);
+      tbody.appendChild(tr0);
+    } else {
+      students.forEach(function(student, idx){
+        var tr = document.createElement('tr');
+
+        var sTd = document.createElement('td');
+        sTd.className = 'serial-cell';
+        sTd.textContent = idx + 1;
+        tr.appendChild(sTd);
+
+        var nTd = document.createElement('td');
+        nTd.className = 'name-cell';
+        var nameSpan = document.createElement('span');
+        nameSpan.textContent = student.name;
+        nTd.appendChild(nameSpan);
+
+        var delBtn = document.createElement('button');
+        delBtn.className = 'delete-btn';
+        delBtn.innerHTML = '✕';
+        delBtn.title = 'Remove student';
+        delBtn.addEventListener('click', function(){
+          if(confirm('Delete ' + student.name + '?')){
+            students = students.filter(function(s){ return s.id !== student.id; });
+            saveToLocalStorage();
+            renderTable();
+            showToast('Student deleted','info');
+          }
+        });
+        nTd.appendChild(delBtn);
+        tr.appendChild(nTd);
+
+        for(var q=0; q<totalQuestions; q++){
+          var td = document.createElement('td');
+          var v = (student.answers && student.answers[q]) || '';
+          if(v === 'yes'){ td.textContent='Yes'; td.className='yes-mark'; }
+          else if(v === 'no'){ td.textContent='No'; td.className='no-mark'; }
+          else { td.textContent='—'; td.className='blank-mark'; }
+          tr.appendChild(td);
+        }
+
+        var tot = computeTotals(student);
+        var yTd = document.createElement('td');
+        yTd.className = 'total-yes-cell';
+        yTd.textContent = tot.yes;
+        tr.appendChild(yTd);
+
+        var nTd2 = document.createElement('td');
+        nTd2.className = 'total-no-cell';
+        nTd2.textContent = tot.no;
+        tr.appendChild(nTd2);
+
+        var rTd = document.createElement('td');
+        var rCls = 'remark-pending';
+        if(tot.remark === 'Pass') rCls = 'remark-pass';
+        else if(tot.remark === 'Fail') rCls = 'remark-fail';
+        rTd.className = 'remark-cell ' + rCls;
+        rTd.textContent = tot.remark;
+        tr.appendChild(rTd);
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    $('studentCounter').textContent =
+      students.length + (students.length === 1 ? ' student' : ' students');
+  }
+    function addQuestion(){
+    if(totalQuestions >= MAX_QUESTIONS){
+      alert('Maximum ' + MAX_QUESTIONS + ' questions allowed.');
+      return;
+    }
+    totalQuestions++;
+    students.forEach(function(s){
+      if(!s.answers) s.answers = [];
+      while(s.answers.length < totalQuestions) s.answers.push('');
+    });
+    while(currentAnswers.length < totalQuestions) currentAnswers.push('');
+    saveToLocalStorage();
+    buildTableHeader();
+    buildEntryGrid();
+    renderTable();
+    showToast('Added Q' + totalQuestions + ' — now ' + totalQuestions + ' questions','success');
+  }
+
+  function removeQuestion(){
+    if(totalQuestions <= MIN_QUESTIONS){
+      alert('At least ' + MIN_QUESTIONS + ' question is required.');
+      return;
+    }
+    if(!confirm('Remove Q' + totalQuestions + '? This will delete the last column from all students.')) return;
+    totalQuestions--;
+    students.forEach(function(s){
+      if(s.answers && s.answers.length > totalQuestions){
+        s.answers = s.answers.slice(0, totalQuestions);
+      }
+    });
+    if(currentAnswers.length > totalQuestions){
+      currentAnswers = currentAnswers.slice(0, totalQuestions);
+    }
+    saveToLocalStorage();
+    buildTableHeader();
+    buildEntryGrid();
+    renderTable();
+    showToast('Removed Q' + (totalQuestions+1) + ' — now ' + totalQuestions + ' questions','info');
+  }
+
+  function addStudent(){
+    var nameInput = $('studentNameInput');
+    var name = nameInput.value.trim();
+
+    if(!name){
+      alert('Please enter the student name first.');
+      nameInput.focus();
+      return;
+    }
+
+    var answered = 0;
+    for(var i=0;i<currentAnswers.length;i++){
+      if(currentAnswers[i] !== '') answered++;
+    }
+
+    if(answered === 0){
+      alert('Please mark at least one question as Yes or No before adding the student.');
+      return;
+    }
+
+    if(answered < totalQuestions){
+      if(!confirm(answered + ' of ' + totalQuestions + ' questions answered. Add ' + name + ' anyway?')) return;
+    }
+
+    var answersCopy = currentAnswers.slice();
+    while(answersCopy.length < totalQuestions) answersCopy.push('');
+
+    students.push({
+      id: generateId(),
+      name: name,
+      answers: answersCopy
+    });
+
+    saveToLocalStorage();
+    renderTable();
+
+    nameInput.value = '';
+    resetCurrentAnswers();
+    refreshEntryGrid();
+    nameInput.focus();
+
+    showToast('Student "' + name + '" added','success');
+  }
+
+  function saveData(){
+    saveToLocalStorage();
+    if(students.length === 0){
+      showToast('Nothing to save — no students yet','info');
+      return;
+    }
+    showToast('💾 Saved ' + students.length + ' student' + (students.length>1?'s':'') + ' successfully','success');
+  }
+
+  function exportToExcel(){
+    if(students.length === 0){
+      alert('No data to export. Add at least one student first.');
+      return;
+    }
+
+    var html = '';
+    html += '<html xmlns:o="urn:schemas-microsoft-com:office:office" ';
+    html += 'xmlns:x="urn:schemas-microsoft-com:office:excel" ';
+    html += 'xmlns="http://www.w3.org/TR/REC-html40">';
+    html += '<head><meta charset="UTF-8"><title>I2 Exam Analysis</title>';
+    html += '<style>';
+    html += 'th{background:#1F4E7A;color:#FFFFFF;font-weight:bold;padding:6px;border:1px solid #999999;text-align:center;font-family:Arial;}';
+    html += 'td{padding:5px;border:1px solid #999999;text-align:center;font-family:Arial;}';
+    html += '.name{text-align:left;font-weight:bold;background:#EEF4FD;}';
+    html += '.yes{background:#E5F4E9;color:#0A542D;font-weight:bold;}';
+    html += '.no{background:#FDEAEA;color:#A12222;font-weight:bold;}';
+    html += '.totalYes{background:#D5EBD9;color:#0A542D;font-weight:bold;}';
+    html += '.totalNo{background:#F8D7D7;color:#A12222;font-weight:bold;}';
+    html += '.rPass{background:#D4EDDA;color:#155724;font-weight:bold;}';
+    html += '.rFail{background:#F8D7DA;color:#721C24;font-weight:bold;}';
+    html += '.rPending{background:#FFF3CD;color:#856404;font-weight:bold;}';
+    html += '</style></head><body>';
+
+    html += '<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;">';
+    html += '<thead><tr>';
+    html += '<th>S.No</th>';
+    html += '<th>Student Name</th>';
+    for(var q=1; q<=totalQuestions; q++){
+      html += '<th>Q' + q + '</th>';
+    }
+    html += '<th class="totalYes">Total Yes</th>';
+    html += '<th class="totalNo">Total No</th>';
+    html += '<th>Remark</th>';
+    html += '</tr></thead><tbody>';
+
+    students.forEach(function(s, i){
+      var tot = computeTotals(s);
+      html += '<tr>';
+      html += '<td>' + (i+1) + '</td>';
+      html += '<td class="name">' + escapeHtml(s.name) + '</td>';
+
+      for(var q=0; q<totalQuestions; q++){
+        var v = (s.answers && s.answers[q]) || '';
+        if(v === 'yes') html += '<td class="yes">Yes</td>';
+        else if(v === 'no') html += '<td class="no">No</td>';
+        else html += '<td>—</td>';
+      }
+
+      html += '<td class="totalYes">' + tot.yes + '</td>';
+      html += '<td class="totalNo">' + tot.no + '</td>';
+
+      var rCls = 'rPending';
+      if(tot.remark === 'Pass') rCls = 'rPass';
+      else if(tot.remark === 'Fail') rCls = 'rFail';
+      html += '<td class="' + rCls + '">' + tot.remark + '</td>';
+      html += '</tr>';
+    });
+
+    html += '</tbody></table></body></html>';
+
+    var blob = new Blob(['\ufeff' + html], { type: 'application/vnd.ms-excel;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    var ts = new Date().toISOString().slice(0,19).replace(/[:T]/g,'-');
+    a.download = 'I2_exam_analysis_' + ts + '.xls';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1500);
+
+    showToast('📥 Excel downloaded — ' + students.length + ' students × ' + totalQuestions + ' questions','success');
+  }
+
+  function saveToLocalStorage(){
+    try {
+      var payload = { totalQuestions: totalQuestions, students: students };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    } catch(e){}
+  }
+
+  function loadFromLocalStorage(){
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return;
+      var parsed = JSON.parse(raw);
+      if(!parsed) return;
+
+      if(typeof parsed.totalQuestions === 'number' && parsed.totalQuestions >= MIN_QUESTIONS && parsed.totalQuestions <= MAX_QUESTIONS){
+        totalQuestions = parsed.totalQuestions;
+      }
+
+      if(Array.isArray(parsed.students)){
+        students = parsed.students.map(function(s){
+          var a = Array.isArray(s.answers) ? s.answers.slice() : [];
+          while(a.length < totalQuestions) a.push('');
+          if(a.length > totalQuestions) a = a.slice(0, totalQuestions);
+          return { id: s.id || generateId(), name: s.name || 'Unnamed', answers: a };
+        });
+      }
+    } catch(e){
+      students = [];
+    }
+
+    while(currentAnswers.length < totalQuestions) currentAnswers.push('');
+    if(currentAnswers.length > totalQuestions) currentAnswers = currentAnswers.slice(0, totalQuestions);
+  }
+
+  function init(){
+    loadFromLocalStorage();
+    buildTableHeader();
+    buildEntryGrid();
+    renderTable();
+
+    $('addStudentBtn').addEventListener('click', addStudent);
+    $('studentNameInput').addEventListener('keypress', function(e){
+      if(e.key === 'Enter'){ e.preventDefault(); addStudent(); }
+    });
+
+    $('markAllYes').addEventListener('click', function(){
+      for(var i=0;i<totalQuestions;i++) currentAnswers[i] = 'yes';
+      refreshEntryGrid();
+    });
+    $('markAllNo').addEventListener('click', function(){
+      for(var i=0;i<totalQuestions;i++) currentAnswers[i] = 'no';
+      refreshEntryGrid();
+    });
+    $('clearAll').addEventListener('click', function(){
+      resetCurrentAnswers();
+      refreshEntryGrid();
+    });
+
+    $('addQuestionBtn').addEventListener('click', addQuestion);
+    $('removeQuestionBtn').addEventListener('click', removeQuestion);
+
+    $('saveBtn').addEventListener('click', saveData);
+    $('exportExcelBtn').addEventListener('click', exportToExcel);
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
