@@ -471,7 +471,7 @@ tr:hover td.name-cell{background:#e8f1fc}
     html += '<html xmlns:o="urn:schemas-microsoft-com:office:office" ';
     html += 'xmlns:x="urn:schemas-microsoft-com:office:excel" ';
     html += 'xmlns="http://www.w3.org/TR/REC-html40">';
-    html += '<head><meta charset="UTF-8"><title>I2 Exam Analysis</title>';
+    html += '<head><meta charset="UTF-8"><title>SA1 QUESTION PAPER Analysis</title>';
     html += '<style>';
     html += 'th{background:#1F4E7A;color:#FFFFFF;font-weight:bold;padding:6px;border:1px solid #999999;text-align:center;font-family:Arial;}';
     html += 'td{padding:5px;border:1px solid #999999;text-align:center;font-family:Arial;}';
@@ -527,7 +527,7 @@ tr:hover td.name-cell{background:#e8f1fc}
     var a = document.createElement('a');
     a.href = url;
     var ts = new Date().toISOString().slice(0,19).replace(/[:T]/g,'-');
-    a.download = 'I2_exam_analysis_' + ts + '.xls';
+    a.download = 'Sa1_exam_analysis_' + ts + '.xls';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
